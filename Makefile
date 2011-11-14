@@ -62,6 +62,7 @@ ifeq ($(UNAME), Darwin)
   CFLAGS+=-fPIC -DPIC -DHAVE_ASPRINTF -DHAVE_VASPRINTF \
 	$(WXCFLAGS) \
 	-isysroot /Developer/SDKs/MacOSX10.6.sdk \
+	-DCURL_PULL_SYS_SOCKET_H \
 	-D__WXOSX_COCOA__ -pthread
   WXLIBS := $(shell wx-config --libs)
   LDFLAGS+=-pthread
