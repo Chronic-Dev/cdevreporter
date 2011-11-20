@@ -257,6 +257,7 @@ static int gzip_afc_dir_recursive(afc_client_t afc, const char* path, const char
 			filenames->push_back(strdup(zname));
 		}
 	}
+	return 0;
 } /*}}}*/
 
 typedef struct {
