@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "CDRWorker.h"
 #include "CDRFetcher.h"
+#include "device_types.h"
 
 static int detection_blocked = 0;
 static CDRWorker* self;

@@ -288,7 +288,7 @@ size_t upload_read_callback(char *bufptr, size_t size, size_t nitems, void *user
 
 static int upload_files(std::vector<char*>* filenames)
 {
-	int i = 0;
+	unsigned int i = 0;
 
 	curl_global_init(CURL_GLOBAL_ALL);
 	response_t* response = NULL;
@@ -426,15 +426,11 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 	unsigned short port = 0;
 	int num_files = 0;
 	char buf[256];
-	struct stat st;
 	std::vector<char*> filenames;
 
 	char tmpf[256];
 	tmpf[0] = '\0';
 	char* error = NULL;
-
-	// TODO check and modify hosts file if required
-	//checkHostsFile();
 
 	if (!tmpnam(tmpf) || (tmpf[0] == '\0')) {
 		error = "ERROR: Could not get temporary filename";
@@ -507,12 +503,7 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 	idevice_free(device);
 	device = NULL;
 
-/*	if (stat(tmpf, &st) < 0) {
-		error = "ERROR: Could not get ZIP file attributes";
-		goto cleanup;
-	}
-*/
-	sprintf(buf, "Got %d crash reports. Uploading now...\n", num_files); //, (int)(st.st_size/1024));
+	sprintf(buf, "Got %d crash reports. Uploading now...\n", num_files);
 	worker->processStatus(buf);
 
 	if (upload_files(&filenames) < 0) {

@@ -14,6 +14,7 @@
 
 #include "CDRMainWnd.h"
 
+#if defined(__APPLE__) || defined(WIN32)
 const char ORIG_HOST[] = "iphonesubmissions.apple.com";
 const char REDIR_IP[] = "127.0.0.1";
 
@@ -48,7 +49,7 @@ static void checkHostsFile(const char* hosts_file) /*{{{*/
 	std::vector<std::string> newlines;
 	bool write_required = false;
 	bool found_it = false;
-	int i;
+	unsigned int i;
 	for (i = 0; i < lines.size(); i++) {
 		std::string line = lines.at(i);
 		if (line.compare(0, 1, "#") == 0) {
@@ -115,6 +116,7 @@ static void checkHostsFile(const char* hosts_file) /*{{{*/
 		}
 	}
 } /*}}}*/
+#endif
 
 class CDevReporter : public wxApp
 {
@@ -154,7 +156,6 @@ bool CDevReporter::OnInit()
 	// now flush dns cache
 	AuthorizationRef authorizationRef;
 	AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &authorizationRef);
-	OSStatus stat;
 
 	char *tool = "/usr/bin/dscacheutil";
 	char *args[] = {"-flushcache", NULL};

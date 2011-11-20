@@ -36,7 +36,7 @@ CFLAGS=-m32 -Wno-write-strings \
 	-I$(LIBIMOBILEDEVICEDIR)/include \
 	-I$(CURLDIR)/include \
 	-DLIBXML_STATIC=1 -DCURL_STATICLIB=1 \
-	-O3 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES
+	-O3 -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES -Wall
 
 LDFLAGS=-m32 -static-libgcc -static-libstdc++
 
