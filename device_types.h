@@ -21,7 +21,7 @@ static struct device_type_t device_types[] = {
 	{"iPad2,1", "iPad 2"},
 	{"iPad2,2", "iPad 2 (GSM)"},
 	{"iPad2,3", "iPad 2 (CDMA"},
-	{"iPhone4,1" "iPhone 4S"},
+	{"iPhone4,1", "iPhone 4S"},
 	{NULL, NULL}
 };
 
