@@ -1,5 +1,5 @@
-#ifndef __DEVICES_H
-#define __DEVICES_H
+#ifndef __DEVICE_TYPES_H
+#define __DEVICE_TYPES_H
 
 struct device_type_t {
 	const char* productType;
