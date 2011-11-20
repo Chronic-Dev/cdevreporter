@@ -314,7 +314,7 @@ static int upload_files(std::vector<char*>* filenames)
 		struct curl_httppost *last = NULL;
 		int num = 0;
 		char fnam[10];
-		while ((num < 5) && (i < filenames->size())) {
+		while ((num < 10) && (i < filenames->size())) {
 			sprintf(fnam, "file%04x", i);
 			curl_formadd(&pd, &last, CURLFORM_COPYNAME, fnam, CURLFORM_FILE, filenames->at(i), CURLFORM_CONTENTTYPE, "application/x-gzip", CURLFORM_END);
 			num++;
