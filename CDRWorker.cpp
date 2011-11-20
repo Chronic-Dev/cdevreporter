@@ -6,7 +6,7 @@
 static int detection_blocked = 0;
 static CDRWorker* self;
 
-inline const char* getDeviceName(const char* productType)
+static const char* getDeviceName(const char* productType)
 {
 	int i = 0;
 	while (device_types[i].productType) {
