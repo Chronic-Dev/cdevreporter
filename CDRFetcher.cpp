@@ -250,7 +250,7 @@ static int gzip_afc_dir_recursive(afc_client_t afc, const char* path, const char
 			}
 			afc_file_close(afc, handle);
 			gzclose(zf);
-			if (st.st_size != total) {
+			if ((uint32_t)st.st_size != total) {
 				fprintf(stderr, "file size mismatch?! skipping.\n");
 				continue;
 			}
