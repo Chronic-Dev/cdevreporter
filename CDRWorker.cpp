@@ -79,7 +79,7 @@ void CDRWorker::checkDevice()
 		if (lerr != LOCKDOWN_E_SUCCESS) {
 			idevice_free(dev);
 			wxString str;
-			str.Printf(wxT("Error detecting device (lockdown error %d"), lerr);
+			str.Printf(wxT("Error detecting device (lockdown error %d)"), lerr);
 			reporter->setStatusText(str);
 			return;
 		}
@@ -99,7 +99,7 @@ void CDRWorker::checkDevice()
 			lockdownd_client_free(client);
 			idevice_free(dev);
 			wxString str;
-			str.Printf(wxT("Error getting product type (lockdown error %d"), lerr);
+			str.Printf(wxT("Error getting product type (lockdown error %d)"), lerr);
 			reporter->setStatusText(str);
 			return;
 		}
@@ -115,7 +115,7 @@ void CDRWorker::checkDevice()
 			lockdownd_client_free(client);
 			idevice_free(dev);
 			wxString str;
-			str.Printf(wxT("Error getting product version (lockdownd error %d"), lerr);
+			str.Printf(wxT("Error getting product version (lockdownd error %d)"), lerr);
 			reporter->setStatusText(str);
 			return;
 		}	
@@ -132,7 +132,7 @@ void CDRWorker::checkDevice()
 			lockdownd_client_free(client);
 			idevice_free(dev);
 			wxString str;
-			str.Printf(wxT("Error getting build version (lockdownd error %d"), lerr);
+			str.Printf(wxT("Error getting build version (lockdownd error %d)"), lerr);
 			reporter->setStatusText(str);
 			return;
 		}
