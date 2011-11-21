@@ -286,8 +286,9 @@ size_t upload_read_callback(char *bufptr, size_t size, size_t nitems, void *user
 	return r;
 }
 
-static int upload_files(std::vector<char*>* filenames)
+static int upload_files(CDRWorker* worker, std::vector<char*>* filenames)
 {
+	char buf[256];
 	unsigned int i = 0;
 
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -295,6 +296,10 @@ static int upload_files(std::vector<char*>* filenames)
 	CURL* handle = NULL;
 
 	while (i < filenames->size()) {
+
+		sprintf(buf, "Got %d crash reports. Uploading now (%d%%)\n", filenames->size(), (int)(((float)i/(float)filenames->size())*100));
+		worker->processStatus(buf);
+
 		handle = curl_easy_init();
 		if (!handle) {
 			fprintf(stderr, "curl_easy_init() failed\n");
@@ -348,6 +353,9 @@ static int upload_files(std::vector<char*>* filenames)
 		fprintf(stderr, "sent %d files\n", num);
 	}
 	curl_global_cleanup();
+
+	sprintf(buf, "Got %d crash reports. Uploading now (100%%)\n", filenames->size());
+	worker->processStatus(buf);
 
 #if 0
 	struct stat st;
@@ -506,7 +514,7 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 	sprintf(buf, "Got %d crash reports. Uploading now...\n", num_files);
 	worker->processStatus(buf);
 
-	if (upload_files(&filenames) < 0) {
+	if (upload_files(worker, &filenames) < 0) {
 		error = "ERROR: Could not upload crash reports!";
 		goto cleanup;
 	}
