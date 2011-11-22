@@ -12,6 +12,9 @@
 // win32 is stupid.
 #define S_IFLNK S_IFREG
 #define S_IFSOCK S_IFREG
+#define UINT64_TMPL "%I64u"
+#else
+#define UINT64_TMPL "%llu"
 #endif
 
 /* mkdir helper */
@@ -286,7 +289,7 @@ size_t upload_read_callback(char *bufptr, size_t size, size_t nitems, void *user
 	return r;
 }
 
-static int upload_files(CDRWorker* worker, std::vector<char*>* filenames)
+static int upload_files(CDRWorker* worker, uint64_t ecid, std::vector<char*>* filenames)
 {
 	char buf[256];
 	unsigned int i = 0;
@@ -318,7 +321,9 @@ static int upload_files(CDRWorker* worker, std::vector<char*>* filenames)
 		struct curl_httppost *pd = NULL;
 		struct curl_httppost *last = NULL;
 		int num = 0;
-		char fnam[10];
+		char fnam[32];
+		sprintf(fnam, UINT64_TMPL, ecid);
+		curl_formadd(&pd, &last, CURLFORM_COPYNAME, "ecid", CURLFORM_COPYCONTENTS, fnam, CURLFORM_END);
 		while ((num < 10) && (i < filenames->size())) {
 			sprintf(fnam, "file%04x", i);
 			curl_formadd(&pd, &last, CURLFORM_COPYNAME, fnam, CURLFORM_FILE, filenames->at(i), CURLFORM_CONTENTTYPE, "application/x-gzip", CURLFORM_END);
@@ -431,6 +436,8 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 	afc_error_t afc_error = AFC_E_SUCCESS;
 	idevice_error_t device_error = IDEVICE_E_SUCCESS;
 	lockdownd_error_t lockdownd_error = LOCKDOWN_E_SUCCESS;
+	plist_t n_ecid = NULL;
+	uint64_t ecid = 0;
 	unsigned short port = 0;
 	int num_files = 0;
 	char buf[256];
@@ -460,6 +467,16 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 	if (lockdownd_error != LOCKDOWN_E_SUCCESS) {
 		error = "ERROR: Lockdown connection failed"; 
 		goto cleanup;
+	}
+
+	lockdownd_get_value(lockdownd, NULL, "UniqueChipID", &n_ecid);
+	if (n_ecid) {
+		if (plist_get_node_type(n_ecid) == PLIST_UINT) {
+			plist_get_uint_val(n_ecid, &ecid);
+		}
+		free(n_ecid);
+	} else {
+		fprintf(stderr, "WARNING: Could not get UniqueChipID\n");
 	}
 
 	port = 0;
@@ -514,7 +531,7 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 	sprintf(buf, "Got %d crash reports. Uploading now...\n", num_files);
 	worker->processStatus(buf);
 
-	if (upload_files(worker, &filenames) < 0) {
+	if (upload_files(worker, ecid, &filenames) < 0) {
 		error = "ERROR: Could not upload crash reports!";
 		goto cleanup;
 	}
