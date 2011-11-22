@@ -3,6 +3,11 @@
 #include "CDRFetcher.h"
 #include "device_types.h"
 
+extern "C" {
+typedef int16_t userpref_error_t;
+extern userpref_error_t userpref_remove_device_public_key(const char *uuid);
+}
+
 static int detection_blocked = 0;
 static CDRWorker* self;
 
@@ -76,7 +81,30 @@ void CDRWorker::checkDevice()
 
 		lockdownd_client_t client = NULL;
 		lockdownd_error_t lerr = lockdownd_client_new_with_handshake(dev, &client, "cdevreporter");
-		if (lerr != LOCKDOWN_E_SUCCESS) {
+		if (lerr == LOCKDOWN_E_PASSWORD_PROTECTED) {
+			lockdownd_client_free(client);
+			idevice_free(dev);
+			wxString str;
+			str.Printf(wxT("ERROR: Device has a passcode set! Unplug device, enter passcode, and plug it back in."));
+			reporter->setStatusText(str);
+			return;
+		} else if (lerr == LOCKDOWN_E_INVALID_HOST_ID) {
+			lerr = lockdownd_unpair(client, NULL);
+			if (lerr == LOCKDOWN_E_SUCCESS) {
+				char *devuuid = NULL;
+				idevice_get_uuid(dev, &devuuid);
+				if (devuuid) {
+					userpref_remove_device_public_key(devuuid);
+					free(devuuid);
+				}
+			}
+			lockdownd_client_free(client);
+			idevice_free(dev);
+			wxString str;
+			str.Printf(wxT("ERROR: Device detection failed due an internal error. Please unplug device and plug it back in."));
+			reporter->setStatusText(str);
+			return;
+		} else if (lerr != LOCKDOWN_E_SUCCESS) {
 			idevice_free(dev);
 			wxString str;
 			str.Printf(wxT("Error detecting device (lockdown error %d)"), lerr);
