@@ -297,7 +297,7 @@ static int upload_files(CDRWorker* worker, std::vector<char*>* filenames)
 
 	while (i < filenames->size()) {
 
-		sprintf(buf, "Got %d crash reports. Uploading now (%d%%)\n", filenames->size(), (int)(((float)i/(float)filenames->size())*100));
+		sprintf(buf, "Got %d crash reports. Uploading now (%d%%)\n", (int)filenames->size(), (int)(((float)i/(float)filenames->size())*100));
 		worker->processStatus(buf);
 
 		handle = curl_easy_init();
@@ -354,7 +354,7 @@ static int upload_files(CDRWorker* worker, std::vector<char*>* filenames)
 	}
 	curl_global_cleanup();
 
-	sprintf(buf, "Got %d crash reports. Uploading now (100%%)\n", filenames->size());
+	sprintf(buf, "Got %d crash reports. Uploading now (100%%)\n", (int)filenames->size());
 	worker->processStatus(buf);
 
 #if 0
