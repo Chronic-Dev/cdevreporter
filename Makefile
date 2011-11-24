@@ -9,8 +9,6 @@ endif
 
 ifdef LIBWX_DIR
   LIBWXDIR=$(LIBWX_DIR)
-else
-  LIBWXDIR=../wxWidgets-2.8.12
 endif
 
 ifdef LIBPLIST_DIR
@@ -58,17 +56,24 @@ ifeq ($(UNAME), Darwin)
   ifeq ($(call check_arch,ppc), yes)
     CFLAGS+=-arch ppc
   endif
-  WXCFLAGS := $(shell wx-config --cflags)
+  ifndef $(LIBWXDIR)
+    LIBWXDIR=../wxWidgets-2.9.2
+  endif
   CFLAGS+=-fPIC -DPIC -DHAVE_ASPRINTF -DHAVE_VASPRINTF \
-	$(WXCFLAGS) \
 	-isysroot /Developer/SDKs/MacOSX10.6.sdk \
 	-DCURL_PULL_SYS_SOCKET_H \
-	-D__WXOSX_COCOA__ -pthread
-  WXLIBS := $(shell wx-config --libs)
+	-D__WXOSX_COCOA__ -DwxDEBUG_LEVEL=0 \
+	-I$(LIBWXDIR)/include -I$(LIBWXDIR)/lib/wx/include/osx_cocoa-unicode-static-2.9 \
+	-pthread
   LDFLAGS+=-pthread
-  LDAPPEND+=-lpthread -lz -lm -liconv $(WXLIBS) -framework Security
+  LDAPPEND+=$(LIBSDIR)/osx/libwxpng-2.9.a \
+	$(LIBSDIR)/osx/libwx_baseu-2.9.a \
+	$(LIBSDIR)/osx/libwx_osx_cocoau_core-2.9.a \
+	-lpthread -lz -lm -liconv \
+	-framework IOKit -framework Carbon -framework Cocoa -framework QuickTime -framework OpenGL -framework System -framework Security
   SYSTYPE=osx
-  FINALTASKS=make -C osx; \
+  FINALTASKS=@upx -9 $(TARGET); \
+	make -C osx; \
 	echo creating bundle; \
 	mkdir -p osx/$(OSX_BUNDLE_NAME).app/Contents/MacOS; \
 	sudo rm -f osx/$(OSX_BUNDLE_NAME).app/Contents/MacOS/* ; \
@@ -83,6 +88,9 @@ ifeq ($(UNAME), Darwin)
 endif
 
 ifeq ($(UNAME), Linux)
+  ifndef $(LIBWXDIR)
+    LIBWXDIR=../wxWidgets-2.9.2
+  endif
   CFLAGS+=-fPIC -DPIC -DHAVE_ASPRINTF -DHAVE_VASPRINTF \
 	-DwxDEBUG_LEVEL=0 \
 	-I$(LIBWXDIR)/include \
@@ -105,6 +113,9 @@ ifeq ($(findstring MINGW,$(UNAME)), MINGW)
   CC=gcc
 endif
 ifdef WIN32
+  ifndef $(LIBWXDIR)
+    LIBWXDIR=../wxWidgets-2.8.12
+  endif
   CFLAGS+=-DWIN32 -D_WIN32 -D__LITTLE_ENDIAN__=1 \
 	-DCURL_PULL_WS2TCPIP_H=1 \
 	-I$(LIBWXDIR)/include \
