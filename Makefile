@@ -82,7 +82,7 @@ ifeq ($(UNAME), Darwin)
 	mkdir -p osx/$(OSX_BUNDLE_NAME).app/Contents/Resources ; \
 	echo "APPL????" > osx/$(OSX_BUNDLE_NAME).app/Contents/PkgInfo ; \
 	cp osx/Info.plist osx/$(OSX_BUNDLE_NAME).app/Contents/ ; \
-	cp osx/greenpois0n.icns osx/$(OSX_BUNDLE_NAME).app/Contents/Resources/ ; \
+	cp osx/reporter.icns osx/$(OSX_BUNDLE_NAME).app/Contents/Resources/ ; \
 	echo done.
   CLEAN_EXTRAS=make -C osx clean
 endif
@@ -152,7 +152,7 @@ main.o: main.cpp
 CDR%.o: CDR%.cpp
 	$(CXX) $(CFLAGS) -c $^ -o $@
 
-win32res.o: win32/res.rc win32/icon.ico
+win32res.o: win32/res.rc win32/reporter.ico
 	windres win32/res.rc -O coff $@
 
 $(TARGET): $(cxx_objects) $(additional_objects)
