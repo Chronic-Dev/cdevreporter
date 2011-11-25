@@ -123,6 +123,40 @@ class CDevReporter : public wxApp
 	virtual bool OnInit();
 };
 
+#if defined(WIN32)
+static bool hasAdminRights()
+{
+	HANDLE hAccessToken = NULL;
+	TOKEN_GROUPS *ptg;
+	DWORD dwInfoBufferSize;
+	PSID psidAdmins = NULL;
+	bool res = false;
+	int bSuccess;
+
+	if ((bSuccess = OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hAccessToken))) {
+		ptg = (TOKEN_GROUPS *)malloc(1024);
+		bSuccess = GetTokenInformation(hAccessToken, TokenGroups, ptg, 1024, &dwInfoBufferSize) ;
+		CloseHandle(hAccessToken);
+		if (bSuccess) {
+			SID_IDENTIFIER_AUTHORITY sia = {SECURITY_NT_AUTHORITY};
+			AllocateAndInitializeSid(&sia, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &psidAdmins);
+			if (psidAdmins) {
+				unsigned int g;
+				for (g = 0; g < ptg->GroupCount; g++) {         
+					if (EqualSid(psidAdmins, ptg->Groups[g].Sid)) {
+						res = true;
+						break;
+					}
+				}
+			}
+			FreeSid(psidAdmins);
+		}
+		free(ptg);
+	}
+	return res;
+}
+#endif
+
 bool CDevReporter::OnInit()
 {
 #if defined(__APPLE__) || defined(WIN32)
@@ -133,6 +167,12 @@ bool CDevReporter::OnInit()
 # if defined(WIN32)
 	char HOSTS_FILE[512];
 	char HOSTS_UMBRELLA[512];
+	
+	if (!hasAdminRights()) {
+		wxMessageBox(wxT("You must run this app as Administrator."), wxT("Error"), wxOK | wxICON_ERROR);
+		return false;
+	}
+	
 	GetSystemDirectoryA(HOSTS_FILE, 512);
 	strcat(HOSTS_FILE, "\\drivers\\etc\\hosts");
 	strcpy(HOSTS_UMBRELLA, HOSTS_FILE);
