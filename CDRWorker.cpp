@@ -201,11 +201,15 @@ void CDRWorker::processFinished(const char* error)
 
 	detection_blocked = 0;
 
-	if (error) {
+	if (error && strcmp(error, "none")) {
 		wxString str = wxString(error, wxConvUTF8);
 		reporter->setStatusText(str);
 		reporter->setButtonEnabled(1);
 	} else {
-		reporter->setStatusText(wxT("SUCCESS\nThanks for your submission! You can unplug your device now."));
+		if (strcmp(error, "none") == 0) {
+			reporter->setStatusText(wxT("No crash reports found - try again at a later time.\nYou can unplug your device now."));
+		} else {
+			reporter->setStatusText(wxT("SUCCESS\nThanks for your submission! You can unplug your device now."));
+		}
 	}
 }

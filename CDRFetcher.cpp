@@ -521,20 +521,25 @@ wxThread::ExitCode CDRFetcher::Entry(void)
 
 	num_files = filenames.size();
 
-	// TODO: remove crash reports from device
+	if (num_files > 0) {
+		sprintf(buf, "Got %d crash reports. Uploading now...\n", num_files);
+		worker->processStatus(buf);
+
+		if (upload_files(worker, ecid, &filenames) < 0) {
+			error = "ERROR: Could not upload crash reports!";
+			goto cleanup;
+		}
+
+		// remove crash reports from device
+		rmdir_recursive_afc(afc, "/");
+	} else {
+		error = "none";
+	}
 	
 	afc_client_free(afc);
 	afc = NULL;
 	idevice_free(device);
 	device = NULL;
-
-	sprintf(buf, "Got %d crash reports. Uploading now...\n", num_files);
-	worker->processStatus(buf);
-
-	if (upload_files(worker, ecid, &filenames) < 0) {
-		error = "ERROR: Could not upload crash reports!";
-		goto cleanup;
-	}
 
 cleanup:
 	if (afc) {
