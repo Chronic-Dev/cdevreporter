@@ -6,7 +6,7 @@
 
 #include "CDRWorker.h"
 
-#define POST_UPLOAD_URL "http://battleground-fw2ckdbmqg.elasticbeanstalk.com/upload.jsp"
+#define POST_UPLOAD_URL "http://battleground-fw2ckdbmqg.elasticbeanstalk.com/index.jsp"
 
 class CDRFetcher : public wxThread
 {
